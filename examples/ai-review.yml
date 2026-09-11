@@ -1,0 +1,24 @@
+# Caller template — copy this file into your repo at
+# .github/workflows/ai-review.yml
+#
+# Triggers on PR open (and when a draft is marked ready), skips drafts,
+# and calls the shared reusable workflow. Review logic lives centrally —
+# update it once in MediaJel/ai-pr-review and every repo picks it up.
+
+name: AI PR Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    uses: MediaJel/ai-pr-review/.github/workflows/pr-review.yml@v1
+    secrets: inherit
