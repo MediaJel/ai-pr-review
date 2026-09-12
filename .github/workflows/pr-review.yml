@@ -86,4 +86,8 @@ jobs:
             - Reference exact file paths and line numbers for every finding.
             - Keep it concise: a short summary, then a numbered list of findings
               ordered by the priority above.
-            - Post the review as a single PR comment.
+            - Post the review as a single PR comment. IMPORTANT: multiline
+              bodies break shell quoting — write the review to a file first,
+              then post it with:
+                gh pr comment ${{ github.event.pull_request.number }} --body-file /tmp/ai-review.md
+              Never pass the review text inline with --body.
