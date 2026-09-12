@@ -47,6 +47,9 @@ jobs:
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
           ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
         with:
+          # Use the workflow's own GITHUB_TOKEN so the action skips the Claude
+          # GitHub App token exchange — no app installation required.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: --model ${{ secrets.REVIEW_MODEL }}
           prompt: |
             You are reviewing pull request #${{ github.event.pull_request.number }} in
