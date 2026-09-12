@@ -53,7 +53,9 @@ jobs:
           # Satisfies the action's auth validation; the CLI actually
           # authenticates via ANTHROPIC_AUTH_TOKEN (Bearer) above.
           anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
-          claude_args: --model ${{ secrets.REVIEW_MODEL }}
+          # Allow the agent the gh commands it needs to read and answer the PR;
+          # without this its comment attempts hit permission denials.
+          claude_args: '--model ${{ secrets.REVIEW_MODEL }} --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh api:*)"'
           prompt: |
             You are reviewing pull request #${{ github.event.pull_request.number }} in
             ${{ github.repository }}.
