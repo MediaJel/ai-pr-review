@@ -26,7 +26,7 @@ once at the organization level to share across repos):
 | --- | --- | --- |
 | `ANTHROPIC_AUTH_TOKEN` | your Z.ai plan API key | your Kimi Code API key |
 | `ANTHROPIC_BASE_URL` | `https://api.z.ai/api/anthropic` | `https://api.kimi.com/coding/` |
-| `REVIEW_MODEL` | `glm-4.7` | `kimi-for-coding` |
+| `REVIEW_MODEL` | `glm-5.3` | `kimi-for-coding` |
 
 **2. Add the caller workflow** to your repo at
 `.github/workflows/ai-review.yml`:
@@ -36,13 +36,12 @@ name: AI PR Review
 
 on:
   pull_request:
-    types: [opened, ready_for_review]
+    types: [opened, synchronize, ready_for_review, reopened]
 
 permissions:
   contents: read
   pull-requests: write
   issues: write
-  id-token: write
 
 jobs:
   review:
@@ -51,7 +50,9 @@ jobs:
     secrets: inherit
 ```
 
-(Also in [`examples/ai-review.yml`](examples/ai-review.yml).)
+(Also in [`examples/ai-review.yml`](examples/ai-review.yml). For maximum
+supply-chain safety, pin `uses:` to a full commit SHA instead of the floating
+major tag — see [Versioning](#versioning).)
 
 **3. Open a PR.** The review lands as a single PR comment.
 
@@ -64,11 +65,13 @@ Coding subscriptions typically have rolling rate windows and weekly caps, and
 stop dead at the cap — every PR review burns the key owner's quota. The
 caller workflow is deliberately conservative:
 
-- Runs on PR **open** (and draft → ready), not on every push
 - Skips draft PRs
-- Cancels superseded runs on the same PR (concurrency group)
+- Cancels superseded runs on the same PR (concurrency group), so rapid
+  pushes only ever leave one review running
 
-To reduce burn further, gate on a label instead of running on every PR:
+It does re-review on every push to an open PR (`synchronize`) — that is where
+most of your quota will go. To reduce burn, remove `synchronize` from the
+caller's trigger list, or gate on a label instead of running on every PR:
 
 ```yaml
 on:
@@ -94,11 +97,15 @@ the workflow does not care.
   public repos — reviews of external contributions simply won't run until a
   maintainer re-triggers them from a branch.
 - **Secrets:** use organization-level secrets to rotate keys in one place.
+- **Caller trust:** the caller hands the reusable workflow your secrets and
+  write-scoped tokens. If you call a workflow you do not control, pin `uses:`
+  to a full commit SHA — tags are movable.
 
 ## Versioning
 
-Consumers should pin a major tag (`@v1`), not `@main`. Improvements ship as
-new tags so one commit can never break every consumer at once.
+Consumers should pin a major tag (`@v1`) or a full commit SHA, not `@main`.
+Releases are immutable semver tags (`v1.0.0`, …); the major tag floats to the
+latest release in that major line. Pinning a SHA is the strongest option:
 
 ## License
 

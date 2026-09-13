@@ -21,14 +21,13 @@ on:
         description: "Anthropic-compatible base URL, e.g. https://api.z.ai/api/anthropic"
         required: true
       REVIEW_MODEL:
-        description: "Model identifier to review with, e.g. glm-4.7"
+        description: "Model identifier to review with, e.g. glm-5.3"
         required: true
 
 permissions:
   contents: read
   pull-requests: write
   issues: write
-  id-token: write
 
 concurrency:
   group: ai-pr-review-${{ github.repository }}-${{ github.event.pull_request.number }}
