@@ -1,0 +1,20 @@
+# Dogfooding: this repo reviews its own PRs with the workflow it ships.
+# Visitors can see a live demo on any open PR.
+
+name: AI PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    # Pinned to a full commit SHA (= v1.1.0) — tags are movable, SHAs are not.
+    uses: MediaJel/ai-pr-review/.github/workflows/pr-review.yml@3067d298eaa82c23006c90057ccd989edb5aebe1
+    secrets: inherit

@@ -20,6 +20,9 @@ permissions:
   pull-requests: write
   issues: write
 
+# NOTE: do not add a concurrency block here — the reusable workflow has one
+# centrally, and a caller-side group with the same name deadlocks the run.
+
 jobs:
   review:
     if: github.event.pull_request.draft == false
