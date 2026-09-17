@@ -41,6 +41,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: AI code review
+        id: review
+        # continue-on-error so quota/auth failures become a polite PR comment
+        # (below) instead of an unexplained red check.
+        continue-on-error: true
         uses: anthropics/claude-code-action@v1
         env:
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
@@ -54,7 +58,8 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
           # Allow the agent the gh commands it needs to read and answer the PR;
           # without this its comment attempts hit permission denials.
-          claude_args: '--model ${{ secrets.REVIEW_MODEL }} --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh api:*)"'
+          # --max-turns bounds quota burn per review on large repos.
+          claude_args: '--model ${{ secrets.REVIEW_MODEL }} --max-turns 30 --allowedTools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Bash(gh api:*)"'
           prompt: |
             You are reviewing pull request #${{ github.event.pull_request.number }} in
             ${{ github.repository }}.
@@ -90,3 +95,20 @@ jobs:
               then post it with:
                 gh pr comment ${{ github.event.pull_request.number }} --body-file /tmp/ai-review.md
               Never pass the review text inline with --body.
+
+      - name: Notify if review unavailable
+        if: steps.review.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file - <<'EOF' || true
+          **AI review unavailable** — the review agent failed before completing.
+
+          Most common cause: the subscription quota backing the review key is
+          exhausted (coding plans stop at their rolling/weekly caps with no
+          overage). The review will work again once the quota window resets;
+          maintainers can check the provider dashboard to confirm.
+
+          Re-trigger by converting this PR to draft and back to ready, or by
+          pushing a new commit.
+          EOF
