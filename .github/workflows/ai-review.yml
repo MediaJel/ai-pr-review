@@ -19,6 +19,6 @@ concurrency:
 jobs:
   review:
     if: github.event.pull_request.draft == false
-    # Pinned to a full commit SHA (= v1.0.0) — tags are movable, SHAs are not.
-    uses: MediaJel/ai-pr-review/.github/workflows/pr-review.yml@14ec37c3f59f9d8a0843b86cc67ff9a8e7367ad0
+    # Pinned to a full commit SHA (= v1.1.0) — tags are movable, SHAs are not.
+    uses: MediaJel/ai-pr-review/.github/workflows/pr-review.yml@3067d298eaa82c23006c90057ccd989edb5aebe1
     secrets: inherit
