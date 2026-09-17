@@ -96,11 +96,12 @@ later is a secrets change only — no code changes in any repo.
 
 ## Supported providers
 
-| Provider | Endpoint | Status |
-| --- | --- | --- |
-| GLM Coding Plan (Z.ai) | `https://api.z.ai/api/anthropic` | ✅ Production-tested (`glm-5.3`, `glm-4.7`) |
-| Kimi Code | `https://api.kimi.com/coding/` | 🔌 Endpoint-compatible, untested — reports welcome |
-| DeepSeek | `https://api.deepseek.com/anthropic` | 🔌 Endpoint-compatible, untested — reports welcome |
+| Provider | Endpoint | Model | Status |
+| --- | --- | --- | --- |
+| GLM Coding Plan (Z.ai) | `https://api.z.ai/api/anthropic` | `glm-5.3` | ✅ Production-tested (subscription) |
+| DeepSeek | `https://api.deepseek.com/anthropic` | `deepseek-chat` | ✅ Tested (pay-as-you-go API key) |
+| Kimi Code subscription | `https://api.kimi.com/coding/` | `kimi-for-coding` | ⚠️ Subscription is OAuth-only since mid-2026 — no API keys, interactive harness only. Not suitable for CI. |
+| Kimi via Moonshot API | `https://api.moonshot.ai/anthropic` | `kimi-k2.7-code` | 🔌 Pay-per-token API keys available; untested — reports welcome |
 
 Anything that speaks the Anthropic Messages API should work. Open an issue or
 PR to add your provider to the table.
