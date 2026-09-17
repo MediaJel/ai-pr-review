@@ -76,16 +76,16 @@ permissions:
   pull-requests: write
   issues: write
 
-concurrency:
-  group: ai-pr-review-${{ github.repository }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
   review:
     if: github.event.pull_request.draft == false
     uses: MediaJel/ai-pr-review/.github/workflows/pr-review.yml@v1
     secrets: inherit
 ```
+
+Do **not** add a caller-side `concurrency` block — the reusable workflow has
+one centrally, and a caller group with the same name deadlocks the run
+(GitHub cancels it immediately).
 
 (Also in [`examples/ai-review.yml`](examples/ai-review.yml). For maximum
 supply-chain safety, pin `uses:` to a full commit SHA instead of the floating

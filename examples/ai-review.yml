@@ -20,11 +20,8 @@ permissions:
   pull-requests: write
   issues: write
 
-# Explicit cancellation of superseded runs on the same PR — don't rely on the
-# called workflow's concurrency block being honored for caller runs.
-concurrency:
-  group: ai-pr-review-${{ github.repository }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+# NOTE: do not add a concurrency block here — the reusable workflow has one
+# centrally, and a caller-side group with the same name deadlocks the run.
 
 jobs:
   review:
